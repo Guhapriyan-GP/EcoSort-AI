@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design & Architecture Walkthrough — EcoSort AI</title>
+    <style>
+        :root {
+            --bg: #090c12;
+            --card: #121824;
+            --border: #1e293b;
+            --accent: #00f28f;
+            --cyan: #00d2ff;
+            --purple: #a855f7;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+        header {
+            padding: 20px 40px;
+            background: #0d121c;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tag {
+            background: rgba(0,242,143,0.12);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 1px solid var(--accent);
+            text-transform: uppercase;
+        }
+        .slide-counter {
+            font-size: 0.9rem;
+            color: var(--cyan);
+            font-weight: 700;
+            background: rgba(0,210,255,0.1);
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,210,255,0.3);
+        }
+        .main-stage {
+            flex-grow: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .slide {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .slide.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 { font-size: 2.2rem; margin-bottom: 12px; color: #fff; }
+        h2 { font-size: 1.4rem; color: var(--cyan); margin-bottom: 24px; font-weight: 500; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        
+        .box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .box h3 { color: var(--accent); margin-bottom: 12px; font-size: 1.1rem; }
+        .box p, .box li { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
+        .box ul { padding-left: 20px; }
+        
+        /* Architecture Flowchart */
+        .flowchart {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 25px 0;
+            gap: 10px;
+        }
+        .flow-step {
+            background: #162032;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            flex: 1;
+            text-align: center;
+        }
+        .flow-step.accent { border-color: var(--accent); background: rgba(0,242,143,0.08); }
+        .flow-step .num { font-size: 0.75rem; text-transform: uppercase; color: var(--cyan); font-weight: 700; margin-bottom: 6px; }
+        .flow-step .title { font-weight: 700; color: #fff; font-size: 0.95rem; }
+        .flow-step .desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 6px; }
+        .flow-arrow { color: var(--accent); font-size: 1.5rem; font-weight: 700; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; padding: 12px; background: #162032; color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        tr.champ { background: rgba(0,242,143,0.08); border-left: 3px solid var(--accent); }
+        
+        /* Footer Controls */
+        footer {
+            padding: 18px 40px;
+            background: #0d121c;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-nav {
+            background: #1e293b;
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-nav:hover { background: var(--accent); color: #000; }
+        .hint { color: var(--text-dim); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <span class="tag">Video 2: System Design Walkthrough</span>
+            <span style="margin-left: 15px; font-weight: 600; color: #fff;">EcoSort AI Architecture Walkthrough</span>
+        </div>
+        <div class="slide-counter" id="slideIndicator">Slide 1 of 5</div>
+    </header>
+
+    <div class="main-stage">
+        <!-- Slide 1: System Overview & Industrial Pipeline -->
+        <div class="slide active" id="slide1">
+            <h1>1. End-to-End System Architecture</h1>
+            <h2>High-Speed Conveyor Sorting Pipeline & Actuation Flow</h2>
+            
+            <div class="flowchart">
+                <div class="flow-step">
+                    <div class="num">Input Stage</div>
+                    <div class="title">Industrial Camera</div>
+                    <div class="desc">Overhead 60 FPS USB3/GigE camera positioned 0.8m above e-waste belt.</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step accent">
+                    <div class="num">Inference Stage</div>
+                    <div class="title">Edge Neural Engine</div>
+                    <div class="desc">YOLOv8n TensorRT/ONNX (CPU/NPU) executing in &lt;20ms.</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <div class="num">Logic Stage</div>
+                    <div class="title">Spatial Tracker</div>
+                    <div class="desc">Translates bounding boxes into conveyor coordinate trajectories.</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step accent">
+                    <div class="num">Actuation Stage</div>
+                    <div class="title">Pneumatic Ejector</div>
+                    <div class="desc">High-speed solenoid air-jet fires at 6 bar to kick cell off belt.</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <div class="num">Safety Stage</div>
+                    <div class="title">Saline Quench Bin</div>
+                    <div class="desc">Thermal runaway containment bath prevents fire ignition.</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 25px;">
+                <div class="box">
+                    <h3>Edge Computing Paradigm</h3>
+                    <p>Designed for complete offline, zero-cloud execution. Processing runs entirely on-premise at the recovery facility with sub-20ms latency, eliminating cloud network latency risks.</p>
+                </div>
+                <div class="box">
+                    <h3>Hardware Fire Containment</h3>
+                    <p>Unlike optical sorters that drop cells into standard bins, isolated batteries are directed into a fire-retardant saline immersion bath to neutralize reactive lithium electrolytes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Data Engineering & Negative Mining -->
+        <div class="slide" id="slide2">
+            <h1>2. Data Engineering & Ground-Truth Pipeline</h1>
+            <h2>Overcoming Real-World Clutter & Dark Background Variations</h2>
+            
+            <div class="grid-3">
+                <div class="box">
+                    <h3>1. Ground-Truth Scrap</h3>
+                    <p>Trained on authentic industrial electronic waste datasets featuring heavy dust, metallic scrap, damaged casing, and overlapping cylindrical/pouch form factors.</p>
+                </div>
+                <div class="box" style="border-color: var(--cyan);">
+                    <h3>2. Hard Negative Mining</h3>
+                    <p>Included negative controls containing zero batteries (aluminum cans, crushed plastic cups, paper, office debris) to penalize false alarms.</p>
+                </div>
+                <div class="box" style="border-color: var(--purple);">
+                    <h3>3. Augmentation Robustness</h3>
+                    <p>Dynamic Mosaic augmentation, HSV color jitter, and random perspective transformations simulate conveyor vibration and dust accumulation.</p>
+                </div>
+            </div>
+
+            <div class="box" style="margin-top: 25px;">
+                <h3>Why Casual Webcams Fail vs. Industrial Reality</h3>
+                <p>Standard foundation models trained on generic COCO objects fail in waste recovery facilities because industrial conveyor streams have dark rubber belts and harsh overhead LED glare. Our model was specifically trained for this exact domain shift.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Multi-Architecture Tournament -->
+        <div class="slide" id="slide3">
+            <h1>3. Multi-Architecture Tournament Benchmark</h1>
+            <h2>Empirical Verification of Edge Efficiency Across Model Families</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Architecture</th>
+                        <th>Parameters / Size</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>mAP@50</th>
+                        <th>Latency (CPU)</th>
+                        <th>Clutter False Alarms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="champ">
+                        <td><strong>Candidate 1: YOLOv8n (Champion)</strong></td>
+                        <td>3.2M / 6.0 MB</td>
+                        <td style="color:var(--accent); font-weight:700;">95.5%</td>
+                        <td>98.0%</td>
+                        <td style="color:var(--cyan); font-weight:700;">98.7%</td>
+                        <td><strong>20.0 ms</strong></td>
+                        <td style="color:var(--accent);"><strong>0 (Zero Alarms)</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Candidate 3: YOLOv8s (Small)</td>
+                        <td>11.2M / 21.5 MB</td>
+                        <td>88.7%</td>
+                        <td>95.8%</td>
+                        <td>97.1%</td>
+                        <td>61.6 ms</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>Candidate 4: YOLO11n (Next-Gen Nano)</td>
+                        <td>2.6M / 5.2 MB</td>
+                        <td>99.6%</td>
+                        <td>93.9%</td>
+                        <td>98.8%</td>
+                        <td>21.2 ms</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>Candidate 2: YOLO11s (Next-Gen Small)</td>
+                        <td>9.4M / 72.5 MB</td>
+                        <td>80.5%</td>
+                        <td>73.5%</td>
+                        <td>78.7%</td>
+                        <td>52.6 ms</td>
+                        <td>11</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="box" style="margin-top: 25px;">
+                <h3>Key Tournament Conclusion</h3>
+                <p>YOLOv8n Edge Nano emerged as the undisputed production champion: achieving <strong>95.5% precision</strong>, <strong>98.7% mAP@50</strong>, and <strong>20ms inference latency</strong> on CPU, while maintaining <strong>zero false alarms on background clutter</strong>.</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Bill of Materials & Economic Feasibility in India -->
+        <div class="slide" id="slide4">
+            <h1>4. Bill of Materials & Economic Feasibility</h1>
+            <h2>Democratizing E-Waste Fire Protection for Indian Municipalities</h2>
+
+            <div class="grid-2">
+                <div class="box">
+                    <h3>Low-Cost Edge Hardware Bill of Materials (BOM)</h3>
+                    <table>
+                        <tr><th>Component</th><th>Specification</th><th>Cost (INR)</th></tr>
+                        <tr><td>Edge Processor</td><td>Raspberry Pi 5 (8GB) / Jetson Nano</td><td>₹7,500</td></tr>
+                        <tr><td>Conveyor Camera</td><td>1080p 60 FPS Industrial USB3 Module</td><td>₹3,000</td></tr>
+                        <tr><td>Pneumatic Actuation</td><td>High-Speed 24V Solenoid Air-Jet Valve</td><td>₹4,500</td></tr>
+                        <tr><td>Relay & Power</td><td>Optocoupled Relay + 24V Industrial PSU</td><td>₹2,500</td></tr>
+                        <tr><td>Containment Bin</td><td>Saline Impregnated Polypropylene Tank</td><td>₹1,500</td></tr>
+                        <tr style="background: rgba(0,242,143,0.1); font-weight:700; color:var(--accent);">
+                            <td colspan="2">Total System Retrofit Cost</td>
+                            <td>₹19,000 (~$230 USD)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="box">
+                    <h3>Comparison: Traditional Sorters vs. EcoSort AI</h3>
+                    <ul style="margin-top: 10px;">
+                        <li style="margin-bottom: 12px;"><strong style="color:#ef4444;">Imported NIR Optical Sorters:</strong> Cost ₹50 Lakhs to over ₹1.2 Crores. Bulky, require dedicated cleanrooms, and cost-prohibitive for Indian urban local bodies.</li>
+                        <li style="margin-bottom: 12px;"><strong style="color:var(--accent);">EcoSort AI Edge Retrofit:</strong> Under ₹20,000 total investment. Mounts directly over existing conveyor belts in minutes with zero structural overhaul.</li>
+                        <li><strong>Scalability:</strong> Deployable across all 3,000+ registered Material Recovery Facilities (MRFs) across Tier-1, Tier-2, and Tier-3 Indian cities.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Fail-Safe Design & Future Roadmap -->
+        <div class="slide" id="slide5">
+            <h1>5. Industrial Integration & Roadmap</h1>
+            <h2>Fail-Safe Architecture & Indian E-Waste Scale</h2>
+
+            <div class="grid-3">
+                <div class="box">
+                    <h3>Fail-Safe Redundancy</h3>
+                    <p>Watchdog timers and optical beam sensors confirm whether the pneumatic jet successfully diverted the battery cell. If a miss occurs, an audible alarm alerts operators.</p>
+                </div>
+                <div class="box">
+                    <h3>Mineral Recovery Revenue</h3>
+                    <p>Segregating batteries before destruction preserves lithium, cobalt, and nickel cells, turning a municipal fire hazard into high-value raw material for Indian battery recyclers.</p>
+                </div>
+                <div class="box">
+                    <h3>Phase 2: Multi-Class Chemistry</h3>
+                    <p>Future firmware updates will classify battery chemistry (Lithium-ion vs. Alkaline vs. Nickel-Cadmium) using spectral feature extraction.</p>
+                </div>
+            </div>
+
+            <div class="box" style="margin-top: 25px; border-color: var(--accent);">
+                <h3>Conclusion</h3>
+                <p>EcoSort AI provides a field-tested, production-grade computer vision solution that tackles India's municipal garbage crisis at the source—preventing landfill fires, protecting sanitation workers, and enabling critical mineral circularity.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <button class="btn-nav" onclick="prevSlide()">◀ Previous Slide [Left Arrow]</button>
+        <span class="hint">Use [Space / Right Arrow] to advance | [Left Arrow] to go back</span>
+        <button class="btn-nav" onclick="nextSlide()">Next Slide [Space / Right Arrow] ▶</button>
+    </footer>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        function updateSlide() {
+            for (let i = 1; i <= totalSlides; i++) {
+                const el = document.getElementById('slide' + i);
+                if (el) el.classList.toggle('active', i === currentSlide);
+            }
+            document.getElementById('slideIndicator').innerText = `Slide ${currentSlide} of ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) currentSlide++;
+            else currentSlide = 1;
+            updateSlide();
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) currentSlide--;
+            else currentSlide = totalSlides;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>

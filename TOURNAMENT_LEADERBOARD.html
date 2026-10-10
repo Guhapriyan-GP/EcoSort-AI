@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Battery Detection — Multi-Model Tournament Leaderboard</title>
+    <style>
+        body { background: #0a0d14; color: #f0f4fc; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; padding: 40px; }
+        .box { max-width: 1100px; margin: 0 auto; background: #121722; border: 1px solid #1e2638; border-radius: 12px; padding: 30px; }
+        h1 { font-size: 2rem; color: #fff; margin-bottom: 8px; }
+        p { color: #8a96aa; font-size: 0.95rem; margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; padding: 12px 14px; background: #161c2a; color: #8a96aa; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid #1e2638; }
+        .champ-card { background: rgba(0,242,143,0.1); border: 1px solid #00f28f; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+        .champ-card h3 { color: #00f28f; margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Autonomous Multi-Model Architecture Tournament Leaderboard</h1>
+        <p>Comparative benchmark across YOLOv8, YOLO11, and feature variations evaluated on hazardous battery detection stream.</p>
+        
+        <div class="champ-card">
+            <h3>Verified Tournament Champion: Candidate 1: YOLOv8n (Edge Nano)</h3>
+            <p style="margin:0;color:#fff;">Precision: <strong>95.5%</strong> | Recall: <strong>98.0%</strong> | mAP@50: <strong>98.7%</strong> | Latency: <strong>20.0 ms</strong> | Model Size: <strong>6.0 MB</strong></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Architecture</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>mAP@50</th>
+                    <th>Inference</th>
+                    <th>Size</th>
+                    <th>Clutter False Alarms</th>
+                    <th>Real Battery Pass</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr style="background: rgba(0,242,143,0.06);">
+            <td style="padding:14px;border-bottom:1px solid #1e2638;"><span style="background:#00f28f;color:#0a0d14;padding:3px 8px;border-radius:4px;font-weight:700;">CHAMPION</span></td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;font-weight:600;color:#fff;">Candidate 1: YOLOv8n (Edge Nano)</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:700;">95.5%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">98.0%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00d2ff;font-weight:700;">98.7%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">20.0 ms</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">6.0 MB</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">0 (Zero Clutter)</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:600;">3/3</td>
+        </tr>
+        
+        <tr style="">
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">#2</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;font-weight:600;color:#fff;">Candidate 3: YOLOv8s (Small Deep Capacity)</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:700;">88.7%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">95.8%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00d2ff;font-weight:700;">97.1%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">61.6 ms</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">21.5 MB</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">0 (Zero Clutter)</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:600;">3/3</td>
+        </tr>
+        
+        <tr style="">
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">#3</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;font-weight:600;color:#fff;">Candidate 4: YOLO11n (Next-Gen Nano C3k2/C2PSA)</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:700;">99.6%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">93.9%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00d2ff;font-weight:700;">98.8%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">21.2 ms</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">5.2 MB</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">1</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:600;">2/3</td>
+        </tr>
+        
+        <tr style="">
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">#4</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;font-weight:600;color:#fff;">Candidate 2: YOLO11s (Next-Gen Small)</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:700;">80.5%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">73.5%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00d2ff;font-weight:700;">78.7%</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">52.6 ms</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">72.5 MB</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;">11</td>
+            <td style="padding:14px;border-bottom:1px solid #1e2638;color:#00f28f;font-weight:600;">3/3</td>
+        </tr>
+        
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
